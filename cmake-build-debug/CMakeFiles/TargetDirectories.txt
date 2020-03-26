@@ -1,0 +1,3 @@
+C:/Users/Mayank Bist/Desktop/OSProject/cmake-build-debug/CMakeFiles/OSProject.dir
+C:/Users/Mayank Bist/Desktop/OSProject/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Mayank Bist/Desktop/OSProject/cmake-build-debug/CMakeFiles/rebuild_cache.dir
