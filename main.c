@@ -20,7 +20,96 @@
 
 #include <stdio.h>
 
+#define maxn 100010
+
+int time_quanta = 2;
+
+struct data {
+    char name[50], arrival_time[50];
+    int pid, at, burst_time, priority;
+} data[110];
+
+int valid(char s[]){
+    for(int i = 0; i < 4;i++){
+        if(i == 2)continue;
+        if(isdigit(s[i]))
+            return 0;
+    }
+    return 1;
+}
+
+void solve() {
+    int no_of_faculty, no_of_students;
+
+    int id = 0;
+    printf("Enter the total number of faculties:");
+    scanf("%d", &no_of_faculty);
+
+    printf("Enter the details of each faculty\n");
+    for (int i = 0; i < no_of_faculty; i++) {
+        //Name of faculty
+        printf("Enter faculty name:");
+        scanf("%[^\n]s", data[id].name);
+
+        //PID
+        printf("Enter PID of %s", data[id].name);
+        scanf("%d", &data[id].pid);
+
+        //Entering the arrival time
+        printf("Time format :- (hh::mm) in 24 hr format\n");
+        printf("Enter arrival time:");
+        scanf("%[^\n]s", data[id].arrival_time);
+
+        while (!valid(data[id].arrival_time)) {
+            printf("Time format :- (hh::mm) in 24 hr format\n");
+            printf("Enter correct arrival time");
+            scanf("%[^\n]s", data[id].arrival_time);
+        }
+
+
+        printf("")
+
+        data[id].priority = 0;
+        id++;
+    }
+
+    printf("Enter the total number of students:");
+    scanf("%d", &no_of_students);
+
+    printf("Enter the details of each student\n");
+    for (int i = 0; i < no_of_faculty; i++) {
+        //Name of faculty
+        printf("Enter student name:");
+        scanf("%[^\n]s", data[id].name);
+
+        //PID
+        printf("Enter PID of %s", data[id].name);
+        scanf("%d", &data[id].pid);
+
+        //Entering the arrival time
+        printf("Time format :- (hh::mm) in 24 hr format\n");
+        printf("Enter arrival time:");
+        scanf("%d", &data[id].arrival_time);
+
+
+        data[id].priority = 1;
+        id++;
+    }
+}
+
+//Write the input format in here to show the user how the input is handled
+void input_format() {
+    printf("Please follow the instructions below ");
+}
+
 int main() {
+    int test_case;
+    printf("Enter total number of test cases:");
+    scanf("%d", &test_case);
+
+    input_format();
+    while (test_case--)
+        solve();
 
     return 0;
 }
