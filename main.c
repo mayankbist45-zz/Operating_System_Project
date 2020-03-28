@@ -67,7 +67,7 @@ int valid(char s[]) {
 int comp(const void *a, const void *b) {
     data *A = (data *) a;
     data *B = (data *) b;
-    return A->at < B->at;
+    return A->at - B->at;
 }
 
 void solve_queries(int f, int s) {
@@ -86,84 +86,103 @@ void solve_queries(int f, int s) {
     int x1 = 0, y1, x2 = 0, y2;
     while (id1 < f || id2 < s) {
         if (id1 < f)
-            while (faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+            while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
                 q1[st1++] = faculty[id1++];
 
         if (id2 < s)
-            while (student[id2].at <= cur && student[id1].burst_time != 0)
+            while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
                 q2[st2++] = student[id2++];
 
         y1 = st1 - 1;
         y2 = st2 - 1;
 
-        while (x1 <= y1) {
-            q1[x1].burst_time -= min(q1[x1].burst_time, time_quanta);
-            cur += time_quanta;
-            if (q1[x1].burst_time)
-                q1[st1++] = q1[x1];
-            else {
+        while(x1 <= y1 || x2 <= y2){
+            if (x1 <= y1) {
+                int delta = min(q1[x1].burst_time, time_quanta);
+                q1[x1].burst_time -= delta;
+                cur += delta;
+                if (q1[x1].burst_time)
+                    q1[st1++] = q1[x1];
+                else {
+                    int tp = q1[x1].id;
+                    faculty[tp].wt = cur - faculty[tp].at - faculty[tp].burst_time;
+                }
 
+                if (id1 < f)
+                    while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+                        q1[st1++] = faculty[id1++];
+
+                if (id2 < s)
+                    while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
+                        q2[st2++] = student[id2++];
+                y2 = st2 - 1;
+                y1 = st1 - 1;
+                x1++;
             }
 
-            if (id1 < f)
-                while (faculty[id1].at <= cur && faculty[id1].burst_time != 0)
-                    q1[st1++] = faculty[id1++];
+            if (x2 <= y2) {
+                int delta = min(q2[x2].burst_time, time_quanta);
+                q2[x2].burst_time -= delta;
+                cur += delta;
 
-            if (id2 < s)
-                while (student[id2].at <= cur && student[id1].burst_time != 0)
-                    q2[st2++] = student[id2++];
-            y2 = st2 - 1;
-            y1 = st1 - 1;
-            x1++;
+                if (q2[x2].burst_time)
+                    q2[st2++] = q2[x2];
+                else {
+                    int tp = q2[x2].id;
+                    student[tp].wt = cur - student[tp].at - student[tp].burst_time;
+                }
+
+                if (id1 < f)
+                    while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+                        q1[st1++] = faculty[id1++];
+
+                if (id2 < s)
+                    while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
+                        q2[st2++] = student[id2++];
+                y2 = st2 - 1;
+                y1 = st1 - 1;
+                x2++;
+            }
         }
 
-        while (x2 <= y2) {
-            q2[x2].burst_time -= min(q2[x2].burst_time, time_quanta);
-            cur += time_quanta;
-            if (q2[x2].burst_time)
-                q2[st2++] = q2[x2];
-
-            if (id1 < f)
-                while (faculty[id1].at <= cur && faculty[id1].burst_time != 0)
-                    q1[st1++] = faculty[id1++];
-
-            if (id2 < s)
-                while (student[id2].at <= cur && student[id1].burst_time != 0)
-                    q2[st2++] = student[id2++];
-            y2 = st2 - 1;
-            y1 = st1 - 1;
-            x2++;
-        }
+        if (x1 <= y1 || x2 <= y2)
+            continue;
+        if (id1 < f && id2 < s)
+            cur = min(faculty[id1].at, student[id2].at);
+        else if (id1 < f)
+            cur = faculty[id1].at;
+        else if (id2 < s)
+            cur = student[id2].at;
+        else break;
     }
-
 }
 
 void solve() {
     int no_of_faculty, no_of_students;
 
-    int id = 0;
     printf("Enter the total number of faculties:");
     scanf("%d", &no_of_faculty);
 
     printf("Enter the details of each faculty\n");
-    for (int i = 0; i < no_of_faculty; i++) {
+    printf("\n");
+    for (int id = 0; id < no_of_faculty; id++) {
         //Name of faculty
         printf("Enter faculty name:");
-        scanf("%[^\n]s", faculty[id].name);
+        scanf("%s", faculty[id].name);
 
         //PID
-        printf("Enter PID of %s", faculty[id].name);
+        printf("Enter PID of %s:", faculty[id].name);
         scanf("%d", &faculty[id].pid);
 
         //Entering the arrival time
         printf("Time format :- (hh::mm) in 24 hr format\n");
         printf("Enter arrival time:");
-        scanf("%[^\n]s", faculty[id].arrival_time);
+        scanf("%s", faculty[id].arrival_time);
 
         while (!valid(faculty[id].arrival_time)) {
             printf("Time format :- (hh::mm) in 24 hr format\n");
             printf("Enter correct arrival time");
-            scanf("%[^\n]s", faculty[id].arrival_time);
+            scanf("%s", faculty[id].arrival_time);
         }
 
         printf("Time should be in seconds\n");
@@ -173,32 +192,33 @@ void solve() {
 
         faculty[id].priority = 0;
         calculate_time_in_seconds(&faculty[id]);
-        id++;
+        faculty[id].id = id;
+        printf("\n\n");
     }
 
     printf("Enter the total number of students:");
     scanf("%d", &no_of_students);
 
-    id = 0;
     printf("Enter the details of each student\n");
-    for (int i = 0; i < no_of_faculty; i++) {
+    printf("\n");
+    for (int id = 0; id < no_of_students; id++) {
         //Name of faculty
         printf("Enter student name:");
-        scanf("%[^\n]s", student[id].name);
+        scanf("%s", student[id].name);
 
         //PID
-        printf("Enter PID of %s", student[id].name);
+        printf("Enter PID of %s:", student[id].name);
         scanf("%d", &student[id].pid);
 
         //Entering the arrival time
         printf("Time format :- (hh::mm) in 24 hr format\n");
         printf("Enter arrival time:");
-        scanf("%[^\n]s", student[id].arrival_time);
+        scanf("%s", student[id].arrival_time);
 
         while (!valid(student[id].arrival_time)) {
             printf("Time format :- (hh::mm) in 24 hr format\n");
             printf("Enter correct arrival time");
-            scanf("%[^\n]s", student[id].arrival_time);
+            scanf("%s", student[id].arrival_time);
         }
 
         //Burst time
@@ -207,14 +227,24 @@ void solve() {
         scanf("%d", &student[id].burst_time);
 
         student[id].priority = 1;
-        id++;
+        calculate_time_in_seconds(&student[id]);
+        faculty[id].id = id;
+
+        printf("\n\n");
     }
     solve_queries(no_of_faculty, no_of_students);
+    for (int i = 0; i < no_of_faculty; i++)
+        printf("%d ", faculty[i].wt);
+    printf("\n");
+    for (int i = 0; i < no_of_students; i++)
+        printf("%d ", student[i].wt);
+    printf("\n");
 }
 
 //Write the input format in here to show the user how the input is handled
 void input_format() {
     printf("Please follow the instructions below:-\n");
+    printf("\n\n");
 }
 
 int main() {
