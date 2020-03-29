@@ -56,7 +56,7 @@ Feel free to give suggestions and improvements.
 
 * **Mayank Bist** - *Initial work* - [mayankbist45](https://github.com/mayankbist45)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/mayankbist45/Opearing_System_Project/graphs/contributors) who participated in this project.
 
 ## License
 
