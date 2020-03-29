@@ -9,4 +9,10 @@
 C:/Users/Mayank Bist/Desktop/OSProject/main.c
 stdio.h
 -
+limits.h
+-
+stdlib.h
+-
+windef.h
+-
 

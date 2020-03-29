@@ -80,6 +80,11 @@ void solve_queries(int f, int s) {
     qsort((void *) faculty, f, sizeof(faculty[0]), comp);
     qsort((void *) student, s, sizeof(student[0]), comp);
 
+    for (int i = 0; i < f; i++)
+        faculty[i].id = i;
+    for (int i = 0; i < s; i++)
+        student[i].id = i;
+
     int min_arrival_time = 10 * 60;//10:00AM
     int cur = min_arrival_time, id1 = 0, id2 = 0, st1 = 0, st2 = 0;
 
@@ -96,53 +101,53 @@ void solve_queries(int f, int s) {
         y1 = st1 - 1;
         y2 = st2 - 1;
 
-        while(x1 <= y1 || x2 <= y2){
-            if (x1 <= y1) {
-                int delta = min(q1[x1].burst_time, time_quanta);
-                q1[x1].burst_time -= delta;
-                cur += delta;
-                if (q1[x1].burst_time)
-                    q1[st1++] = q1[x1];
-                else {
-                    int tp = q1[x1].id;
-                    faculty[tp].wt = cur - faculty[tp].at - faculty[tp].burst_time;
-                }
-
-                if (id1 < f)
-                    while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
-                        q1[st1++] = faculty[id1++];
-
-                if (id2 < s)
-                    while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
-                        q2[st2++] = student[id2++];
-                y2 = st2 - 1;
-                y1 = st1 - 1;
-                x1++;
+        point1:
+        while (x1 <= y1) {
+            int delta = min(q1[x1].burst_time, time_quanta);
+            q1[x1].burst_time -= delta;
+            cur += delta;
+            if (q1[x1].burst_time)
+                q1[st1++] = q1[x1];
+            else {
+                int tp = q1[x1].id;
+                faculty[tp].wt = cur - faculty[tp].at - faculty[tp].burst_time;
             }
 
-            if (x2 <= y2) {
-                int delta = min(q2[x2].burst_time, time_quanta);
-                q2[x2].burst_time -= delta;
-                cur += delta;
+            if (id1 < f)
+                while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+                    q1[st1++] = faculty[id1++];
 
-                if (q2[x2].burst_time)
-                    q2[st2++] = q2[x2];
-                else {
-                    int tp = q2[x2].id;
-                    student[tp].wt = cur - student[tp].at - student[tp].burst_time;
-                }
+            if (id2 < s)
+                while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
+                    q2[st2++] = student[id2++];
+            y2 = st2 - 1;
+            y1 = st1 - 1;
+            x1++;
+        }
 
-                if (id1 < f)
-                    while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
-                        q1[st1++] = faculty[id1++];
+        while (x2 <= y2) {
+            int delta = min(q2[x2].burst_time, time_quanta);
+            q2[x2].burst_time -= delta;
+            cur += delta;
 
-                if (id2 < s)
-                    while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
-                        q2[st2++] = student[id2++];
-                y2 = st2 - 1;
-                y1 = st1 - 1;
-                x2++;
+            if (q2[x2].burst_time)
+                q2[st2++] = q2[x2];
+            else {
+                int tp = q2[x2].id;
+                student[tp].wt = cur - student[tp].at - student[tp].burst_time;
             }
+
+            if (id1 < f)
+                while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+                    q1[st1++] = faculty[id1++];
+
+            if (id2 < s)
+                while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
+                    q2[st2++] = student[id2++];
+            y2 = st2 - 1;
+            y1 = st1 - 1;
+            x2++;
+            if (x1 <= y1)goto point1;
         }
 
         if (x1 <= y1 || x2 <= y2)
@@ -167,23 +172,23 @@ void solve() {
     printf("\n");
     for (int id = 0; id < no_of_faculty; id++) {
         //Name of faculty
-        printf("Enter faculty name:");
-        scanf("%s", faculty[id].name);
+//        printf("Enter faculty name:");
+//        scanf("%s", faculty[id].name);
 
         //PID
         printf("Enter PID of %s:", faculty[id].name);
         scanf("%d", &faculty[id].pid);
 
         //Entering the arrival time
-        printf("Time format :- (hh::mm) in 24 hr format\n");
-        printf("Enter arrival time:");
-        scanf("%s", faculty[id].arrival_time);
-
-        while (!valid(faculty[id].arrival_time)) {
-            printf("Time format :- (hh::mm) in 24 hr format\n");
-            printf("Enter correct arrival time");
-            scanf("%s", faculty[id].arrival_time);
-        }
+//        printf("Time format :- (hh::mm) in 24 hr format\n");
+//        printf("Enter arrival time:");
+//        scanf("%s", faculty[id].arrival_time);
+//
+//        while (!valid(faculty[id].arrival_time)) {
+//            printf("Time format :- (hh::mm) in 24 hr format\n");
+//            printf("Enter correct arrival time");
+//            scanf("%s", faculty[id].arrival_time);
+//        }
 
         printf("Time should be in seconds\n");
         printf("Enter burst time:");
@@ -191,7 +196,7 @@ void solve() {
 
 
         faculty[id].priority = 0;
-        calculate_time_in_seconds(&faculty[id]);
+//        calculate_time_in_seconds(&faculty[id]);
         faculty[id].id = id;
         printf("\n\n");
     }
@@ -203,23 +208,23 @@ void solve() {
     printf("\n");
     for (int id = 0; id < no_of_students; id++) {
         //Name of faculty
-        printf("Enter student name:");
-        scanf("%s", student[id].name);
+//        printf("Enter student name:");
+//        scanf("%s", student[id].name);
 
         //PID
         printf("Enter PID of %s:", student[id].name);
         scanf("%d", &student[id].pid);
 
-        //Entering the arrival time
-        printf("Time format :- (hh::mm) in 24 hr format\n");
-        printf("Enter arrival time:");
-        scanf("%s", student[id].arrival_time);
-
-        while (!valid(student[id].arrival_time)) {
-            printf("Time format :- (hh::mm) in 24 hr format\n");
-            printf("Enter correct arrival time");
-            scanf("%s", student[id].arrival_time);
-        }
+//        //Entering the arrival time
+//        printf("Time format :- (hh::mm) in 24 hr format\n");
+//        printf("Enter arrival time:");
+//        scanf("%s", student[id].arrival_time);
+//
+//        while (!valid(student[id].arrival_time)) {
+//            printf("Time format :- (hh::mm) in 24 hr format\n");
+//            printf("Enter correct arrival time");
+//            scanf("%s", student[id].arrival_time);
+//        }
 
         //Burst time
         printf("Time should be in seconds\n");
@@ -227,7 +232,7 @@ void solve() {
         scanf("%d", &student[id].burst_time);
 
         student[id].priority = 1;
-        calculate_time_in_seconds(&student[id]);
+//        calculate_time_in_seconds(&student[id]);
         faculty[id].id = id;
 
         printf("\n\n");
