@@ -26,11 +26,10 @@
 //maxn means the maximum no of students and faculties we can have
 #define maxn 100010
 
-int time_quanta = 2;
-
+int time_quanta = 2, cur = 0;
 typedef struct {
-    char name[50], arrival_time[50];
-    int pid, at, burst_time, priority, wt, id;
+    char arrival_time[50];
+    int pid, at, burst_time, priority, wt, id, td;
 } data;
 data faculty[maxn], student[maxn], q1[maxn], q2[maxn];
 
@@ -88,16 +87,17 @@ void solve_queries(int f, int s) {
         student[ide].id = ide;
 
     int min_arrival_time = 10 * 60;//10:00AM
-    int cur = min_arrival_time, id1 = 0, id2 = 0, st1 = 0, st2 = 0;
+    cur = min_arrival_time;
+    int id1 = 0, id2 = 0, st1 = 0, st2 = 0;
 
     int x1 = 0, y1, x2 = 0, y2;
     while (id1 < f || id2 < s) {
         if (id1 < f)
-            while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+            while (id1 < f && faculty[id1].at <= cur)
                 q1[st1++] = faculty[id1++];
 
         if (id2 < s)
-            while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
+            while (id2 < s && student[id2].at <= cur)
                 q2[st2++] = student[id2++];
 
         y1 = st1 - 1;
@@ -113,14 +113,15 @@ void solve_queries(int f, int s) {
             else {
                 int tp = q1[x1].id;
                 faculty[tp].wt = cur - faculty[tp].at - faculty[tp].burst_time;
+                faculty[tp].td = cur - faculty[tp].at;
             }
 
             if (id1 < f)
-                while (id1 < f && faculty[id1].at <= cur && faculty[id1].burst_time != 0)
+                while (id1 < f && faculty[id1].at <= cur)
                     q1[st1++] = faculty[id1++];
 
             if (id2 < s)
-                while (id2 < s && student[id2].at <= cur && student[id1].burst_time != 0)
+                while (id2 < s && student[id2].at <= cur)
                     q2[st2++] = student[id2++];
             y2 = st2 - 1;
             y1 = st1 - 1;
@@ -137,6 +138,7 @@ void solve_queries(int f, int s) {
             else {
                 int tp = q2[x2].id;
                 student[tp].wt = cur - student[tp].at - student[tp].burst_time;
+                student[tp].td = cur - student[tp].at;
             }
 
             if (id1 < f)
@@ -174,7 +176,7 @@ void solve() {
     printf("\n");
     for (int id = 0; id < no_of_faculty; id++) {
         //PID
-        printf("Enter PID of faculty %d:", id);
+        printf("Enter PID of faculty %d:", id + 1);
         scanf("%d", &faculty[id].pid);
 
 //        Entering the arrival time
@@ -196,7 +198,7 @@ void solve() {
         faculty[id].priority = 0;
         calculate_time_in_seconds(&faculty[id]);
         faculty[id].id = id;
-        printf("\n\n");
+        printf("\n");
     }
 
     printf("Enter the total number of students:");
@@ -206,7 +208,7 @@ void solve() {
     printf("\n");
     for (int id = 0; id < no_of_students; id++) {
         //PID
-        printf("Enter PID of %s:", student[id].name);
+        printf("Enter PID of student %d:", id + 1);
         scanf("%d", &student[id].pid);
 
         //Entering the arrival time
@@ -226,18 +228,36 @@ void solve() {
         scanf("%d", &student[id].burst_time);
 
         student[id].priority = 1;
-//        calculate_time_in_seconds(&student[id]);
+        calculate_time_in_seconds(&student[id]);
         faculty[id].id = id;
 
-        printf("\n\n");
+        printf("\n");
     }
     solve_queries(no_of_faculty, no_of_students);
-    for (int i = 0; i < no_of_faculty; i++)
-        printf("%d ", faculty[i].wt);
-    printf("\n");
-    for (int i = 0; i < no_of_students; i++)
-        printf("%d ", student[i].wt);
-    printf("\n");
+
+    printf("Total summary at the end\n");
+    int tp = -1;
+    if (no_of_faculty)
+        tp = faculty[0].at;
+    if (no_of_students) {
+        if (tp != -1) {
+            tp = min(tp, student[0].at);
+        } else {
+            tp = student[0].at;
+        }
+    }
+    if (tp == -1)
+        tp = 0;
+
+    printf("PID    Waiting Time    Turnaround Time    Faculty\n");
+    for (int i = 0; i < no_of_faculty; i++) {
+        printf("%d      %d               %d                  True\n", faculty[i].pid, faculty[i].wt, faculty[i].td);
+    }
+    for (int i = 0; i < no_of_students; i++) {
+        printf("%d      %d               %d                  False\n", student[i].pid, student[i].wt, student[i].td);
+    }
+    printf("Total time spent on handling queries :%d seconds\n", cur - tp);
+    printf("Total average time spent on handling queries :%d seconds\n", (cur - tp) / (no_of_faculty + no_of_students));
 }
 
 //Write the input format in here to show the user how the input is handled
@@ -248,10 +268,10 @@ void input_format() {
 
 int main() {
     int test_case;
+    input_format();
     printf("Enter total number of test cases:");
     scanf("%d", &test_case);
 
-    input_format();
     while (test_case--)
         solve();
 
