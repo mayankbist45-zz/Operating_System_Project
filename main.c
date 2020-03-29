@@ -36,37 +36,39 @@ data faculty[maxn], student[maxn], q1[maxn], q2[maxn];
 
 void calculate_time_in_seconds(data *d) {
     d->at = 0;
-    int hr = 0, mn = 0;
-    for (int i = 0; i < 2; i++)
-        hr = hr * 10 + d->arrival_time[i] - '0';
+    int ghnta = 0, minutes = 0;
+    for (int ide = 0; ide < 2; ide++)
+        ghnta = ghnta * 10 + d->arrival_time[ide] - '0';
 
-    for (int i = 3; i < 5; i++)
-        mn = mn * 10 + d->arrival_time[i] - '0';
+    for (int ide = 3; ide < 5; ide++)
+        minutes = minutes * 10 + d->arrival_time[ide] - '0';
 
-    d->at = hr * 60 + mn;
+    d->at = ghnta * 60 + minutes;
 }
 
 int valid(char s[]) {
-    for (int i = 0; i < 4; i++) {
-        if (i == 2)continue;
-        if (!isdigit(s[i]))
+    for (int ide = 0; ide < 4; ide++) {
+        if (ide == 2)continue;
+        if (!isdigit(s[ide]))
             return 0;
     }
-    int hr = 0, mn = 0;
-    for (int i = 0; i < 2; i++)
-        hr = hr * 10 + s[i] - '0';
+    int ghnta = 0, minutes = 0;
+    for (int ide = 0; ide < 2; ide++)
+        ghnta = ghnta * 10 + s[ide] - '0';
 
-    for (int i = 3; i < 5; i++)
-        mn = mn * 10 + s[i] - '0';
+    for (int ide = 3; ide < 5; ide++)
+        minutes = minutes * 10 + s[ide] - '0';
 
-    if (hr < 10)
+    if (ghnta < 10)
         return 0;
     return 1;
 }
 
-int comp(const void *a, const void *b) {
-    data *A = (data *) a;
-    data *B = (data *) b;
+int comp(const void *appr, const void *bbbr) {
+    data *A = (data *) appr;
+    data *B = (data *) bbbr;
+    if (A->at == B->at)
+        return A->id - B->id;
     return A->at - B->at;
 }
 
@@ -80,10 +82,10 @@ void solve_queries(int f, int s) {
     qsort((void *) faculty, f, sizeof(faculty[0]), comp);
     qsort((void *) student, s, sizeof(student[0]), comp);
 
-    for (int i = 0; i < f; i++)
-        faculty[i].id = i;
-    for (int i = 0; i < s; i++)
-        student[i].id = i;
+    for (int ide = 0; ide < f; ide++)
+        faculty[ide].id = ide;
+    for (int ide = 0; ide < s; ide++)
+        student[ide].id = ide;
 
     int min_arrival_time = 10 * 60;//10:00AM
     int cur = min_arrival_time, id1 = 0, id2 = 0, st1 = 0, st2 = 0;
@@ -171,24 +173,20 @@ void solve() {
     printf("Enter the details of each faculty\n");
     printf("\n");
     for (int id = 0; id < no_of_faculty; id++) {
-        //Name of faculty
-//        printf("Enter faculty name:");
-//        scanf("%s", faculty[id].name);
-
         //PID
-        printf("Enter PID of %s:", faculty[id].name);
+        printf("Enter PID of faculty %d:", id);
         scanf("%d", &faculty[id].pid);
 
-        //Entering the arrival time
-//        printf("Time format :- (hh::mm) in 24 hr format\n");
-//        printf("Enter arrival time:");
-//        scanf("%s", faculty[id].arrival_time);
-//
-//        while (!valid(faculty[id].arrival_time)) {
-//            printf("Time format :- (hh::mm) in 24 hr format\n");
-//            printf("Enter correct arrival time");
-//            scanf("%s", faculty[id].arrival_time);
-//        }
+//        Entering the arrival time
+        printf("Time format :- (hh::mm) in 24 hr format\n");
+        printf("Enter arrival time:");
+        scanf("%s", faculty[id].arrival_time);
+
+        while (!valid(faculty[id].arrival_time)) {
+            printf("Time format :- (hh::mm) in 24 hr format\n");
+            printf("Enter correct arrival time");
+            scanf("%s", faculty[id].arrival_time);
+        }
 
         printf("Time should be in seconds\n");
         printf("Enter burst time:");
@@ -196,7 +194,7 @@ void solve() {
 
 
         faculty[id].priority = 0;
-//        calculate_time_in_seconds(&faculty[id]);
+        calculate_time_in_seconds(&faculty[id]);
         faculty[id].id = id;
         printf("\n\n");
     }
@@ -207,24 +205,20 @@ void solve() {
     printf("Enter the details of each student\n");
     printf("\n");
     for (int id = 0; id < no_of_students; id++) {
-        //Name of faculty
-//        printf("Enter student name:");
-//        scanf("%s", student[id].name);
-
         //PID
         printf("Enter PID of %s:", student[id].name);
         scanf("%d", &student[id].pid);
 
-//        //Entering the arrival time
-//        printf("Time format :- (hh::mm) in 24 hr format\n");
-//        printf("Enter arrival time:");
-//        scanf("%s", student[id].arrival_time);
-//
-//        while (!valid(student[id].arrival_time)) {
-//            printf("Time format :- (hh::mm) in 24 hr format\n");
-//            printf("Enter correct arrival time");
-//            scanf("%s", student[id].arrival_time);
-//        }
+        //Entering the arrival time
+        printf("Time format :- (hh::mm) in 24 hr format\n");
+        printf("Enter arrival time:");
+        scanf("%s", student[id].arrival_time);
+
+        while (!valid(student[id].arrival_time)) {
+            printf("Time format :- (hh::mm) in 24 hr format\n");
+            printf("Enter correct arrival time");
+            scanf("%s", student[id].arrival_time);
+        }
 
         //Burst time
         printf("Time should be in seconds\n");
@@ -248,7 +242,7 @@ void solve() {
 
 //Write the input format in here to show the user how the input is handled
 void input_format() {
-    printf("Please follow the instructions below:-\n");
+    printf("Program to calculate Waiting time and Turn around time\n");
     printf("\n\n");
 }
 
